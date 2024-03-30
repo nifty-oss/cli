@@ -7,6 +7,21 @@ on:
         type: string
       solana:
         type: string
+  workflow_dispatch:
+    inputs:
+      rust:
+        description: Rust version
+        default: 1.70.0
+        required: true
+        type: string
+      solana:
+        description: Solana version
+        default: 1.16.18
+        required: true
+        type: string
+
+env:
+  CACHE: true
 
 jobs:
   build_cli:

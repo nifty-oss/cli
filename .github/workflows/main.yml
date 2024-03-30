@@ -52,7 +52,7 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
 
       - name: Run build
-        uses: ./.github/workflows/build.yml
+        uses: .github/workflows/build.yml
         with:
           rust: ${{ env.RUST_VERSION }}
           solana: ${{ env.SOLANA_VERSION }}
