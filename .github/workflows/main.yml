@@ -40,7 +40,6 @@ jobs:
   build_and_release:
     name: Build and Release
     uses: ./.github/workflows/build.yml
-    secrets: inherit
     with:
       rust: ${{ env.RUST_VERSION }}
       solana: ${{ env.SOLANA_VERSION }}
