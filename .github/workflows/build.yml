@@ -43,7 +43,7 @@ jobs:
           key: rust-cli-${{ matrix.os }}
 
       - name: Build Rust CLI
-        working-directory: clients/cli
+        working-directory: '.'
         run: |
           cargo build --all-features --release --bin nifty
           mv ./target/release/nifty ./target/release/nifty-cli-${{ runner.os }}
