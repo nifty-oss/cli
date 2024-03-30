@@ -4,6 +4,12 @@ A CLI for interacting with the Nifty asset program.
 
 ## Installation
 
+Via install script:
+
+```bash
+bash <(curl -sSf https://raw.githubusercontent.com/nifty-oss/cli/main/scripts/install.sh)
+```
+
 From source:
 
 ```bash
