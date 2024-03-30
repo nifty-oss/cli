@@ -38,9 +38,9 @@ jobs:
           args: --all-targets --all-features --no-deps
 
   build_and_release:
-    - name: Build and Release
-      uses: ./.github/workflows/build.yml
-      secrets: inherit
-      with:
-        rust: ${{ env.RUST_VERSION }}
-        solana: ${{ env.SOLANA_VERSION }}
+    name: Build and Release
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+    with:
+      rust: ${{ env.RUST_VERSION }}
+      solana: ${{ env.SOLANA_VERSION }}
