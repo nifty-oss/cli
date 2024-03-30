@@ -49,6 +49,38 @@ Recipient specified and receives reclaimed rent:
 nifty burn 92D3tDoqtREj3Exkr5ws9UPawG3yhaEwjSP4J5GumuRP 9Z3tDoqtREj3Exkr5ws9UPawG3yhaEwjSP4J5GumuRP
 ```
 
+### Mint 
+
+Create an asset with extension data
+
+```
+Usage: nifty mint [OPTIONS] <ASSET_FILE_PATH>
+
+Arguments:
+  <ASSET_FILE_PATH>  
+
+Options:
+  -k, --keypair-path <KEYPAIR_PATH>  Path to the keypair file
+  -r, --rpc-url <RPC_URL>            RPC URL for the Solana cluster
+  -h, --help                         Print help
+```
+
+### Mint-Batch
+
+Create a batch of assets with extension data
+
+```
+Usage: nifty mint-batch [OPTIONS] <ASSET_FILES_DIR>
+
+Arguments:
+  <ASSET_FILES_DIR>
+
+Options:
+  -k, --keypair-path <KEYPAIR_PATH>  Path to the keypair file
+  -r, --rpc-url <RPC_URL>            RPC URL for the Solana cluster
+  -h, --help                         Print help
+```
+
 ### Create
 
 Creates a new asset.
@@ -130,12 +162,12 @@ nifty decode 92D3tDoqtREj3Exkr5ws9UPawG3yhaEwjSP4J5GumuRP --field state
 
 prints only the state information of the asset.
 
-### Delegate
+### Approve
 
 Set a delegate on an asset with specific roles
 
 ```
-Usage: nifty delegate [OPTIONS] <ASSET> <DELEGATE>
+Usage: nifty approve [OPTIONS] <ASSET> <DELEGATE>
 
 Arguments:
   <ASSET>     The asset to delegate
@@ -146,12 +178,31 @@ Options:
   -R, --role <ROLE>                  The role for the delegate to have: "burn", "lock", "transfer". Specify each one separately: --role burn --role lock --role transfer
   -r, --rpc-url <RPC_URL>            RPC URL for the Solana cluster
   -h, --help                         Print help
-```
 
 Example:
 
 ```bash
-nifty delegate 92D3tDoqtREj3Exkr5ws9UPawG3yhaEwjSP4J5GumuRP 9Z3tDoqtREj3Exkr5ws9UPawG3yhaEwjSP4J5GumuRP --role burn --role lock
+nifty approve 92D3tDoqtREj3Exkr5ws9UPawG3yhaEwjSP4J5GumuRP 9Z3tDoqtREj3Exkr5ws9UPawG3yhaEwjSP4J5GumuRP --role burn --role lock
+```
+
+### Revoke
+
+Revoke a delegate from an asset
+
+```
+Revoke a delegate from an asset
+
+Usage: nifty revoke [OPTIONS] <ASSET>
+
+Arguments:
+  <ASSET>  The asset to revoke the delegate from
+
+Options:
+  -k, --keypair-path <KEYPAIR_PATH>  Path to the keypair file
+  -R, --role <ROLE>                  The roles to revoke: "burn", "lock", "transfer". Specify each one separately: --role burn --role lock --role transfer
+      --all                          Revoke all roles from the delegate and clear it
+  -r, --rpc-url <RPC_URL>            RPC URL for the Solana cluster
+  -h, --help                         Print help
 ```
 
 ### Lock
