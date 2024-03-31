@@ -1,7 +1,7 @@
 use std::{fmt, ops::Deref};
 
 use nifty_asset::{
-    extensions::{Blob, Links, Manager, Royalties},
+    extensions::{Attributes, Blob, ExtensionData, Grouping, Links, Manager, Metadata, Royalties},
     types::Creator,
     JsonCreator,
 };
@@ -9,7 +9,7 @@ use nifty_asset_types::{
     constraints::{
         And, Constraint, FromBytes, Not, Operator, OperatorType, Or, OwnedBy, PubkeyMatch,
     },
-    extensions::{Attributes, Extension, ExtensionData, ExtensionType, Grouping, Metadata},
+    extensions::{Extension, ExtensionType},
     podded::ZeroCopy,
 };
 use serde_json::{json, Value};

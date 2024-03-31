@@ -1,16 +1,16 @@
 {
     "name": "Sakura Kinomoto",
     "mutable": false,
-    "image": "sakura.png",
     "standard": "NonFungible",
     "asset_keypair_file": null,
     "owner": "Dn5Pq1Nus6Wt1Lw8rLuH7XgMfRUKxXzMR9BEta45TzAs",
     "extensions": [
         {
-            "extension_type": "Blob",
+            "extension_type": "Metadata",
             "value": {
-                "content_type": "image/png",
-                "path": "./example_extensions/test.png"
+                "symbol": "SYMBOL",
+                "description": "Description",
+                "uri": "https://arweave.net/62Z5yOFbIeFqvoOl-aq75EAGSDzS-GxpIKC2ws5LVDc"
             }
         }
     ]

@@ -1,6 +1,4 @@
-use std::fs::File;
-
-use nifty_asset::{AssetArgs, AssetFile, ExtensionArgs, MintAccounts, MintIxArgs};
+use crate::transaction::pack_instructions;
 
 use super::*;
 
@@ -42,7 +40,6 @@ pub async fn handle_mint(args: MintArgs) -> Result<()> {
         .map(|extension| ExtensionArgs {
             extension_type: extension.extension_type.clone(),
             data: extension.value.clone().into_data(),
-            chunked: true,
         })
         .collect::<Vec<ExtensionArgs>>();
 
@@ -52,8 +49,11 @@ pub async fn handle_mint(args: MintArgs) -> Result<()> {
         extension_args,
     })?;
 
-    for instruction in instructions {
-        let sig = send_and_confirm_tx(&config.client, &[&authority_sk, &asset_sk], &[instruction])?;
+    let packed_instructions = pack_instructions(2, &authority_sk.pubkey(), &instructions);
+
+    // Instructions are packed to max data length sizes, so we only put one in each tx.
+    for instructions in packed_instructions {
+        let sig = send_and_confirm_tx(&config.client, &[&authority_sk, &asset_sk], &instructions)?;
         println!("sig: {}", sig);
     }
 

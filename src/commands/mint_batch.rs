@@ -1,5 +1,7 @@
 use std::{sync::Arc, time::Duration};
 
+use crate::transaction::pack_instructions;
+
 use super::*;
 
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
@@ -108,7 +110,6 @@ pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
             .map(|extension| ExtensionArgs {
                 extension_type: extension.extension_type.clone(),
                 data: extension.value.clone().into_data(),
-                chunked: true,
             })
             .collect::<Vec<ExtensionArgs>>();
 
@@ -146,10 +147,13 @@ pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
             let pb = mp.add(ProgressBar::new(asset_instructions.len() as u64));
             pb.set_style(sty.clone());
 
-            for instruction in asset_instructions {
+            let packed_instructions =
+                pack_instructions(2, &authority_sk.pubkey(), &asset_instructions);
+
+            for instructions in packed_instructions {
                 let asset_sk = &asset_keys.lock().await[i];
                 let asset_address = &asset_sk.pubkey();
-                let res = send_and_confirm_tx(&client, &[&authority_sk, &asset_sk], &[instruction]);
+                let res = send_and_confirm_tx(&client, &[&authority_sk, &asset_sk], &instructions);
                 pb.set_message(format!("sending transactions for asset {asset_address}"));
                 pb.inc(1);
 

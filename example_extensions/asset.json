@@ -68,7 +68,8 @@
     {
       "extension_type": "Metadata",
       "value": {
-        "symbol": "SMB",
+        "symbol": "SAKURA",
+        "description": "example description",
         "uri": "https://arweave.net/62Z5yOFbIeFqvoOl-aq75EAGSDzS-GxpIKC2ws5LVDc"
       }
     }
