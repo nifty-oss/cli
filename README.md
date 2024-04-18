@@ -1,6 +1,17 @@
-# Nifty CLI
+<h1 align="center">
+  Nifty CLI
+</h1>
+<p align="center">
+  <img width="400" alt="Nifty CLI" src="https://github.com/nifty-oss/cli/assets/729235/b078b393-350b-4340-80b0-f19b6275d6fc" />
+</p>
+<p align="center">
+  A CLI for interacting with the Nifty Asset program.
+</p>
 
-A CLI for interacting with the Nifty asset program.
+<p align="center">
+  <a href="https://github.com/nifty-oss/asset/actions/workflows/main.yml"><img src="https://img.shields.io/github/actions/workflow/status/nifty-oss/cli/main.yml?logo=GitHub" /></a>
+  <a href="https://github.com/nifty-oss/cli/releases/latest"><img src="https://img.shields.io/github/v/release/nifty-oss/cli" /></a>
+</p>
 
 ## Installation
 
@@ -278,3 +289,19 @@ Example:
   ```bash
   nifty transfer 92D3tDoqtREj3Exkr5ws9UPawG3yhaEwjSP4J5GumuRP 9Z3tDoqtREj3Exkr5ws9UPawG3yhaEwjSP4J5GumuRP
   ```
+
+## License
+
+Copyright (c) 2024 nifty-oss maintainers
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
