@@ -2,7 +2,7 @@
   Nifty CLI
 </h1>
 <p align="center">
-  <img width="400" alt="Nifty CLI" src="https://github.com/nifty-oss/cli/assets/729235/b078b393-350b-4340-80b0-f19b6275d6fc" />
+  <img width="400" alt="Nifty CLI" src="https://github.com/nifty-oss/cli/assets/729235/588f8bbb-39d2-4be3-a7e3-176238fdb779" />
 </p>
 <p align="center">
   A CLI for interacting with the Nifty Asset program.
