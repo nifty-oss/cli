@@ -27,6 +27,7 @@ pub fn handle_create(args: CreateArgs) -> Result<()> {
         name: args.name,
         standard: Standard::NonFungible,
         mutable: !args.immutable,
+        extensions: None,
     };
 
     let ix = Create {
@@ -35,6 +36,7 @@ pub fn handle_create(args: CreateArgs) -> Result<()> {
         owner,
         payer: Some(authority),
         group: None,
+        group_authority: None,
         system_program: Some(system_program::id()),
     }
     .instruction(ix_args);

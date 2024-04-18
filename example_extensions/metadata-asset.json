@@ -1,5 +1,5 @@
 {
-    "name": "Sakura Kinomoto",
+    "name": "Studious Crab",
     "mutable": false,
     "standard": "NonFungible",
     "asset_keypair_file": null,
@@ -9,8 +9,8 @@
             "extension_type": "Metadata",
             "value": {
                 "symbol": "SYMBOL",
-                "description": "Description",
-                "uri": "https://arweave.net/62Z5yOFbIeFqvoOl-aq75EAGSDzS-GxpIKC2ws5LVDc"
+                "description": "Studious crabs collection",
+                "uri": "https://arweave.net/uVtABL4PYv0wVke3LL4DLMkqkSMcQl1qswRZNkJ0a0g"
             }
         }
     ]

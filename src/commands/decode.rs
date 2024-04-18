@@ -1,7 +1,9 @@
 use std::{fmt, ops::Deref};
 
 use nifty_asset::{
-    extensions::{Attributes, Blob, ExtensionData, Grouping, Links, Manager, Metadata, Royalties},
+    extensions::{
+        Attributes, Blob, ExtensionData, Grouping, Links, Manager, Metadata, Proxy, Royalties,
+    },
     types::Creator,
     JsonCreator,
 };
@@ -184,6 +186,10 @@ pub fn handle_decode(args: DecodeArgs) -> Result<()> {
                 let manager: Manager = Manager::from_bytes(extension_data);
                 let delegate = manager.delegate;
                 println!("authority: {delegate:#?}");
+            }
+            ExtensionType::Proxy => {
+                let proxy = Proxy::from_bytes(extension_data);
+                println!("proxy: {proxy:#?}");
             }
             ExtensionType::None => {
                 println!("None");

@@ -18,10 +18,8 @@ clap = { version = "4.4.10", features = ["derive"] }
 dirs = "5.0.1"
 indexmap = { version = "2.1.0", features = ["serde"] }
 indicatif = "0.17.8"
-# nifty-asset = { version = "0.1.0", features = ["serde"] }
-nifty-asset = { path = "../asset/clients/rust/asset", features = ["serde"] }
-# nifty-asset-types = { version = "0.1.0" }
-nifty-asset-types = { path = "../asset/programs/asset/types" }
+nifty-asset = { version = "0.4.0", features = ["serde"] }
+nifty-asset-types = { version = "0.4.0" }
 podded = "0.5.1"
 retry = "2.0.0"
 serde = "1.0.193"
