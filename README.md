@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/nifty-oss/asset/actions/workflows/main.yml"><img src="https://img.shields.io/github/actions/workflow/status/nifty-oss/cli/main.yml?logo=GitHub" /></a>
+  <a href="https://github.com/nifty-oss/cli/actions/workflows/main.yml"><img src="https://img.shields.io/github/actions/workflow/status/nifty-oss/cli/main.yml?logo=GitHub" /></a>
   <a href="https://github.com/nifty-oss/cli/releases/latest"><img src="https://img.shields.io/github/v/release/nifty-oss/cli" /></a>
 </p>
 
