@@ -39,9 +39,10 @@ pub use {
     },
     serde::{Deserialize, Serialize},
     solana_program::system_program,
-    solana_sdk::pubkey::Pubkey,
     solana_sdk::{
+        pubkey::Pubkey,
         signature::{read_keypair_file, Keypair},
         signer::Signer,
+        transaction::Transaction,
     },
 };

@@ -1,5 +1,7 @@
 use std::{sync::Arc, time::Duration};
 
+use crate::transaction::pack_instructions;
+
 use super::*;
 
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
@@ -9,6 +11,7 @@ pub struct MintBatchArgs {
     pub keypair_path: Option<PathBuf>,
     pub rpc_url: Option<String>,
     pub asset_files_dir: PathBuf,
+    pub delay: u64,
 }
 
 pub struct AssetStruct {
@@ -44,8 +47,6 @@ impl TxResult {
         }
     }
 }
-
-const DELAY_MS: u64 = 100;
 
 pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
     let config = CliConfig::new(args.keypair_path, args.rpc_url)?;
@@ -108,7 +109,6 @@ pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
             .map(|extension| ExtensionArgs {
                 extension_type: extension.extension_type.clone(),
                 data: extension.value.clone().into_data(),
-                chunked: true,
             })
             .collect::<Vec<ExtensionArgs>>();
 
@@ -127,7 +127,7 @@ pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
     let client = Arc::new(config.client);
     let authority_sk = Arc::new(authority_sk);
 
-    let mp = MultiProgress::new();
+    let mp: MultiProgress = MultiProgress::new();
     let sty =
         ProgressStyle::with_template("[{percent}%] {bar:40.blue/white} {pos:>7}/{len:7} {msg}")
             .unwrap()
@@ -139,18 +139,26 @@ pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
         let asset_keys = asset_keys.clone();
         let asset_results = asset_results.clone();
 
-        let mp = mp.clone();
-        let sty = sty.clone();
+        let sty_clone = sty.clone();
+        let mp_clone = mp.clone();
 
+        // Each thread concurrently mints a single asset by serially executing all the transactions needed
+        // to create the asset and set its extension data.
         futures.push(tokio::spawn(async move {
-            let pb = mp.add(ProgressBar::new(asset_instructions.len() as u64));
-            pb.set_style(sty.clone());
+            // Pack all the instructions for minting this asset into as few transactions as possible.
+            let packed_transactions =
+                pack_instructions(2, &authority_sk.pubkey(), &asset_instructions);
 
-            for instruction in asset_instructions {
-                let asset_sk = &asset_keys.lock().await[i];
-                let asset_address = &asset_sk.pubkey();
-                let res = send_and_confirm_tx(&client, &[&authority_sk, &asset_sk], &[instruction]);
-                pb.set_message(format!("sending transactions for asset {asset_address}"));
+            // Create a progress bar for each asset w/ the number of transactions to send.
+            let pb = mp_clone.add(ProgressBar::new(packed_transactions.len() as u64));
+            pb.set_style(sty_clone.clone());
+
+            let asset_sk = &asset_keys.lock().await[i];
+            let asset_address = &asset_sk.pubkey();
+            pb.set_message(format!("sending transactions for asset {asset_address}"));
+
+            for transaction in packed_transactions {
+                let res = send_and_confirm_tx(&client, &[&authority_sk, &asset_sk], &transaction);
                 pb.inc(1);
 
                 match res {
@@ -162,10 +170,11 @@ pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
                     }
                 }
             }
+            pb.finish_with_message(format!("asset {asset_address} minted"));
         }));
 
         // Sleep for a short time to avoid sending transactions too quickly
-        tokio::time::sleep(Duration::from_millis(DELAY_MS)).await;
+        tokio::time::sleep(Duration::from_millis(args.delay)).await;
     }
 
     for future in futures {
@@ -180,10 +189,10 @@ pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
                 result.asset_name,
                 result.tx_result.get_error().unwrap()
             );
-        } else {
-            println!("Minted asset: {}", result.asset_pubkey);
         }
     }
+
+    mp.clear().unwrap();
 
     Ok(())
 }

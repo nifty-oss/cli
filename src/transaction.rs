@@ -1,8 +1,10 @@
 use anyhow::Result;
+use nifty_asset::MAX_TX_SIZE;
 use retry::{delay::Exponential, retry};
 use solana_client::rpc_client::RpcClient;
 use solana_program::instruction::Instruction;
 use solana_sdk::{
+    pubkey::Pubkey,
     signature::{Keypair, Signature},
     signer::Signer,
     transaction::Transaction,
@@ -46,4 +48,34 @@ pub fn send_and_confirm_tx_with_retries(
     )?;
 
     Ok(res)
+}
+
+pub fn pack_instructions<'a>(
+    num_signers: u32,
+    payer: &'a Pubkey,
+    ixs: &'a [Instruction],
+) -> Vec<Vec<Instruction>> {
+    // This contains the instructions that will be sent in each transaction.
+    let mut transactions: Vec<Vec<Instruction>> = vec![];
+    // Batch instructions for each tx into this vector, ensuring we don't exceed max payload size.
+    let mut tx_instructions: Vec<Instruction> = vec![];
+
+    // 64 bytes for each signature + Message size
+    let max_payload_size = MAX_TX_SIZE - std::mem::size_of::<Signature>() * num_signers as usize;
+
+    for ix in ixs {
+        tx_instructions.push(ix.clone());
+        let tx = Transaction::new_with_payer(tx_instructions.as_slice(), Some(payer));
+        let tx_len = bincode::serialize(&tx).unwrap().len();
+
+        if tx_len > max_payload_size {
+            let last_ix = tx_instructions.pop().unwrap();
+            transactions.push(tx_instructions.clone());
+            tx_instructions.clear();
+            tx_instructions.push(last_ix);
+        }
+    }
+    transactions.push(tx_instructions);
+
+    transactions
 }

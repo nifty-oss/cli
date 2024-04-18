@@ -1,17 +1,17 @@
 use std::{fmt, ops::Deref};
 
 use nifty_asset::{
-    extensions::{Blob, Links, Manager, Royalties},
-    types::Creator,
-    JsonCreator,
-};
-use nifty_asset_types::{
     constraints::{
         And, Constraint, FromBytes, Not, Operator, OperatorType, Or, OwnedBy, PubkeyMatch,
     },
-    extensions::{Attributes, Extension, ExtensionData, ExtensionType, Grouping, Metadata},
-    podded::ZeroCopy,
+    extensions::{
+        Attributes, Blob, Extension, ExtensionData, ExtensionType, Grouping, Links, Manager,
+        Metadata, Proxy, Royalties,
+    },
+    types::Creator,
+    JsonCreator,
 };
+use podded::ZeroCopy;
 use serde_json::{json, Value};
 
 use super::*;
@@ -184,6 +184,10 @@ pub fn handle_decode(args: DecodeArgs) -> Result<()> {
                 let manager: Manager = Manager::from_bytes(extension_data);
                 let delegate = manager.delegate;
                 println!("authority: {delegate:#?}");
+            }
+            ExtensionType::Proxy => {
+                let proxy = Proxy::from_bytes(extension_data);
+                println!("proxy: {proxy:#?}");
             }
             ExtensionType::None => {
                 println!("None");

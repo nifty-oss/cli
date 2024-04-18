@@ -69,11 +69,15 @@ async fn main() -> Result<()> {
             })
             .await
         }
-        Commands::MintBatch { asset_files_dir } => {
+        Commands::MintBatch {
+            asset_files_dir,
+            delay,
+        } => {
             handle_mint_batch(MintBatchArgs {
                 keypair_path,
                 rpc_url,
                 asset_files_dir,
+                delay,
             })
             .await
         }

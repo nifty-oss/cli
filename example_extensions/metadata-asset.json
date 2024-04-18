@@ -1,0 +1,17 @@
+{
+    "name": "Studious Crab",
+    "mutable": false,
+    "standard": "NonFungible",
+    "asset_keypair_file": null,
+    "owner": "Dn5Pq1Nus6Wt1Lw8rLuH7XgMfRUKxXzMR9BEta45TzAs",
+    "extensions": [
+        {
+            "extension_type": "Metadata",
+            "value": {
+                "symbol": "SYMBOL",
+                "description": "Studious crabs collection",
+                "uri": "https://arweave.net/uVtABL4PYv0wVke3LL4DLMkqkSMcQl1qswRZNkJ0a0g"
+            }
+        }
+    ]
+}
