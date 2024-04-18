@@ -4,7 +4,7 @@ version = "0.0.0"
 authors = ["nifty-oss maintainers <maintainers@nifty-oss.org>"]
 edition = "2021"
 readme = "README.md"
-license-file = "../../LICENSE"
+license-file = "../LICENSE"
 
 [[bin]]
 name = "nifty"
@@ -23,7 +23,7 @@ podded = "0.5.1"
 retry = "2.0.0"
 serde = "1.0.193"
 serde_json = "1.0.108"
-serde_with = "3.4.0"
+serde_with = "3.7.0"
 serde_yaml = "0.9.27"
 solana-client = "~1.16"
 solana-logger = "~1.16"
