@@ -57,7 +57,7 @@ pub async fn handle_mint(args: MintArgs) -> Result<()> {
         println!("sig: {}", sig);
     }
 
-    println!("Mint asset: {}", asset);
+    println!("Minted asset: {}", asset);
 
     Ok(())
 }

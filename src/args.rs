@@ -31,7 +31,13 @@ pub enum Commands {
     /// Create an asset with extension data.
     Mint { asset_file_path: PathBuf },
     /// Create a batch of assets with extension data.
-    MintBatch { asset_files_dir: PathBuf },
+    MintBatch {
+        asset_files_dir: PathBuf,
+
+        /// Delay in ms between transactions.
+        #[arg(long, default_value = "100")]
+        delay: u64,
+    },
     /// Create a basic asset with no extensions.
     Create {
         /// The name of the asset.

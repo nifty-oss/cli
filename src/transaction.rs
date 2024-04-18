@@ -55,8 +55,10 @@ pub fn pack_instructions<'a>(
     payer: &'a Pubkey,
     ixs: &'a [Instruction],
 ) -> Vec<Vec<Instruction>> {
-    let mut instructions = vec![];
-    let mut tx_instructions = vec![];
+    // This contains the instructions that will be sent in each transaction.
+    let mut transactions: Vec<Vec<Instruction>> = vec![];
+    // Batch instructions for each tx into this vector, ensuring we don't exceed max payload size.
+    let mut tx_instructions: Vec<Instruction> = vec![];
 
     // 64 bytes for each signature + Message size
     let max_payload_size = MAX_TX_SIZE - std::mem::size_of::<Signature>() * num_signers as usize;
@@ -68,11 +70,12 @@ pub fn pack_instructions<'a>(
 
         if tx_len > max_payload_size {
             let last_ix = tx_instructions.pop().unwrap();
-            instructions.push(tx_instructions.clone());
+            transactions.push(tx_instructions.clone());
             tx_instructions.clear();
             tx_instructions.push(last_ix);
         }
     }
+    transactions.push(tx_instructions);
 
-    instructions
+    transactions
 }
