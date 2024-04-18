@@ -55,7 +55,7 @@ jobs:
         uses: nifty-oss/actions/buildjet-cache-crate@v1
         with:
           folder: '.'
-          key: rust-cli-${{ matrix.os }}
+          key: nifty-cli-${{ matrix.os }}
 
       - name: Build Rust CLI
         id: build
@@ -76,7 +76,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: rust-cli-build-${{ matrix.os }}
+          name: nifty-cli-${{ steps.build.outputs.extension }}
           path: ./target/release/*nifty-cli-${{ steps.build.outputs.extension }}
           if-no-files-found: error
 
