@@ -5,6 +5,10 @@ authors = ["nifty-oss maintainers <maintainers@nifty-oss.org>"]
 edition = "2021"
 readme = "README.md"
 license-file = "LICENSE"
+description = "CLI for the Nifty Asset program."
+repository = "https://github.com/nifty-oss/cli"
+homepage = "https://nifty-oss.org"
+documentation = "https://nifty-oss.org"
 
 [[bin]]
 name = "nifty"
