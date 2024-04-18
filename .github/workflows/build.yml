@@ -71,6 +71,8 @@ jobs:
 
           mv ./target/release/nifty ./target/release/nifty-cli-${extension}
 
+          echo "::set-output name=extension::${extension}"
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
