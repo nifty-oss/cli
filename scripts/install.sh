@@ -39,7 +39,7 @@ esac
  
 RELEASE_URL="https://github.com/nifty-oss/cli/releases"
 RELEASE="latest"
-BIN="nifty-cli"
+BIN="nifty"
 VERSION="ubuntu-2004"
 
 if [ "$OS_FLAVOUR" = Darwin ]; then
