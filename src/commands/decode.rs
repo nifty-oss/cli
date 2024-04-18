@@ -1,19 +1,17 @@
 use std::{fmt, ops::Deref};
 
 use nifty_asset::{
+    constraints::{
+        And, Constraint, FromBytes, Not, Operator, OperatorType, Or, OwnedBy, PubkeyMatch,
+    },
     extensions::{
-        Attributes, Blob, ExtensionData, Grouping, Links, Manager, Metadata, Proxy, Royalties,
+        Attributes, Blob, Extension, ExtensionData, ExtensionType, Grouping, Links, Manager,
+        Metadata, Proxy, Royalties,
     },
     types::Creator,
     JsonCreator,
 };
-use nifty_asset_types::{
-    constraints::{
-        And, Constraint, FromBytes, Not, Operator, OperatorType, Or, OwnedBy, PubkeyMatch,
-    },
-    extensions::{Extension, ExtensionType},
-    podded::ZeroCopy,
-};
+use podded::ZeroCopy;
 use serde_json::{json, Value};
 
 use super::*;

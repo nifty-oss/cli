@@ -2104,7 +2104,6 @@ dependencies = [
  "indexmap 2.1.0",
  "indicatif",
  "nifty-asset",
- "nifty-asset-types",
  "podded",
  "retry",
  "serde",
