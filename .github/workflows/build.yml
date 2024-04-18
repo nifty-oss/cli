@@ -58,20 +58,28 @@ jobs:
           key: rust-cli-${{ matrix.os }}
 
       - name: Build Rust CLI
+        id: build
         working-directory: '.'
         run: |
           cargo build --all-features --release --bin nifty
-          mv ./target/release/nifty ./target/release/nifty-cli-${{ runner.os }}
+
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
+            extension="ubuntu-2004"
+          else
+            extension="${{ matrix.os }}"
+          fi
+
+          mv ./target/release/nifty ./target/release/nifty-cli-${extension}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: rust-cli-build-${{ matrix.os }}
-          path: ./target/release/*nifty-cli-${{ runner.os }}
+          path: ./target/release/*nifty-cli-${{ steps.build.outputs.extension }}
           if-no-files-found: error
 
       - name: Release Tags
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: ./target/release/*nifty-cli-${{ runner.os }}
+          files: ./target/release/*nifty-cli-${{ steps.build.outputs.extension }}

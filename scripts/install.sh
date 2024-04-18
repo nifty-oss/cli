@@ -40,15 +40,15 @@ esac
 RELEASE_URL="https://github.com/nifty-oss/cli/releases"
 RELEASE="latest"
 BIN="nifty"
-VERSION="ubuntu-latest"
+VERSION="ubuntu-2004"
 
 if [ "$OS_FLAVOUR" = Darwin ]; then
     case "$PROCESSOR" in
         arm* )
-            VERSION="macos-m1-latest"
+            VERSION="macos-14"
             ;;
         *)
-            VERSION="macos-intel-latest"
+            VERSION="macos-13"
             ;;
     esac
 fi
