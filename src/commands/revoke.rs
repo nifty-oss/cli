@@ -11,6 +11,7 @@ pub struct RevokeArgs {
     pub asset: Pubkey,
     pub role: Vec<String>,
     pub all: bool,
+    pub priority: Priority,
 }
 
 pub fn handle_revoke(args: RevokeArgs) -> Result<()> {
@@ -31,7 +32,7 @@ pub fn handle_revoke(args: RevokeArgs) -> Result<()> {
         })
         .collect();
 
-    let args = RevokeInstructionArgs {
+    let ix_args = RevokeInstructionArgs {
         delegate_input: if args.all {
             DelegateInput::All
         } else {
@@ -39,9 +40,21 @@ pub fn handle_revoke(args: RevokeArgs) -> Result<()> {
         },
     };
 
-    let ix = Revoke { asset, signer }.instruction(args);
+    let ix = Revoke { asset, signer }.instruction(ix_args);
 
-    let sig = send_and_confirm_tx(&config.client, &[&signer_sk], &[ix])?;
+    let signers = vec![&signer_sk];
+
+    let micro_lamports = get_priority_fee(&args.priority);
+    let compute_units =
+        get_compute_units(&config.client, &[ix.clone()], &signers)?.unwrap_or(200_000);
+
+    let instructions = vec![
+        ComputeBudgetInstruction::set_compute_unit_limit(compute_units as u32),
+        ComputeBudgetInstruction::set_compute_unit_price(micro_lamports),
+        ix,
+    ];
+
+    let sig = send_and_confirm_tx_with_spinner(&config.client, &signers, &instructions)?;
 
     println!("Revoking the delegate on asset {asset} in tx: {sig}");
 

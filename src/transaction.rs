@@ -1,18 +1,72 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use nifty_asset::MAX_TX_SIZE;
 use retry::{delay::Exponential, retry};
-use solana_client::rpc_client::RpcClient;
+use solana_client::{rpc_client::RpcClient, rpc_config::RpcSimulateTransactionConfig};
 use solana_program::instruction::Instruction;
 use solana_sdk::{
+    commitment_config::CommitmentConfig,
+    hash::Hash,
     pubkey::Pubkey,
     signature::{Keypair, Signature},
     signer::Signer,
     transaction::Transaction,
 };
 
+use std::{
+    fmt::{self, Display, Formatter},
+    str::FromStr,
+};
+
+#[derive(Debug, Default, Clone, Eq, PartialEq)]
+pub enum Priority {
+    None,
+    #[default]
+    Low,
+    Medium,
+    High,
+    Max,
+}
+
+impl FromStr for Priority {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "none" => Ok(Self::None),
+            "low" => Ok(Self::Low),
+            "medium" => Ok(Self::Medium),
+            "high" => Ok(Self::High),
+            "max" => Ok(Self::Max),
+            _ => Err(anyhow!("Invalid priority".to_string())),
+        }
+    }
+}
+
+impl Display for Priority {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::None => write!(f, "None"),
+            Self::Low => write!(f, "Low"),
+            Self::Medium => write!(f, "Medium"),
+            Self::High => write!(f, "High"),
+            Self::Max => write!(f, "Max"),
+        }
+    }
+}
+
+pub fn get_priority_fee(priority: &Priority) -> u64 {
+    match priority {
+        Priority::None => 1_000,
+        Priority::Low => 50_000,
+        Priority::Medium => 200_000,
+        Priority::High => 1_000_000,
+        Priority::Max => 2_000_000,
+    }
+}
+
 #[macro_export]
 macro_rules! transaction {
-    ($signers:expr, $instructions:expr, $client:expr) => {
+    ($client:expr, $signers:expr, $instructions:expr) => {
         Transaction::new_signed_with_payer(
             $instructions,
             Some(&$signers[0].pubkey()),
@@ -27,9 +81,21 @@ pub fn send_and_confirm_tx(
     signers: &[&Keypair],
     ixs: &[Instruction],
 ) -> Result<Signature> {
-    let tx = transaction!(signers, ixs, client);
+    let tx = transaction!(client, signers, ixs);
 
     let signature = client.send_and_confirm_transaction(&tx)?;
+
+    Ok(signature)
+}
+
+pub fn send_and_confirm_tx_with_spinner(
+    client: &RpcClient,
+    signers: &[&Keypair],
+    ixs: &[Instruction],
+) -> Result<Signature> {
+    let tx = transaction!(client, signers, ixs);
+
+    let signature = client.send_and_confirm_transaction_with_spinner(&tx)?;
 
     Ok(signature)
 }
@@ -39,7 +105,7 @@ pub fn send_and_confirm_tx_with_retries(
     signers: &[&Keypair],
     ixs: &[Instruction],
 ) -> Result<Signature> {
-    let tx = transaction!(signers, ixs, client);
+    let tx = transaction!(client, signers, ixs);
 
     // Send tx with retries.
     let res = retry(
@@ -78,4 +144,41 @@ pub fn pack_instructions<'a>(
     transactions.push(tx_instructions);
 
     transactions
+}
+
+pub fn get_compute_units(
+    client: &RpcClient,
+    ixs: &[Instruction],
+    signers: &[&Keypair],
+) -> Result<Option<u64>> {
+    let config = RpcSimulateTransactionConfig {
+        sig_verify: false,
+        replace_recent_blockhash: true,
+        commitment: Some(CommitmentConfig::confirmed()),
+        ..Default::default()
+    };
+
+    let tx = Transaction::new_signed_with_payer(
+        ixs,
+        Some(&signers[0].pubkey()),
+        signers,
+        Hash::new(Pubkey::default().as_ref()), // dummy value
+    );
+
+    // This doesn't return an error if the simulation fails
+    let sim_result = client.simulate_transaction_with_config(&tx, config)?;
+
+    // it sets the error Option on the value in the Ok variant, so we check here
+    // and return the error manually.
+    if let Some(err) = sim_result.value.err {
+        return Err(err.into());
+    }
+
+    // Otherwise, we can get the compute units from the simulation result
+    let units = sim_result
+        .value
+        .units_consumed
+        .map(|units| (units as f64 * 1.20) as u64);
+
+    Ok(units)
 }

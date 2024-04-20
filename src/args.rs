@@ -3,6 +3,8 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use solana_program::pubkey::Pubkey;
 
+use crate::transaction::Priority;
+
 #[derive(Parser)]
 #[clap(author, version, about)]
 pub struct Args {
@@ -27,9 +29,17 @@ pub enum Commands {
 
         /// The recipient to receive reclaimed rent. Defaults to the signer.
         recipient: Option<Pubkey>,
+
+        #[arg(short = 'P', long, default_value = "low")]
+        priority: Priority,
     },
     /// Create an asset with extension data.
-    Mint { asset_file_path: PathBuf },
+    Mint {
+        asset_file_path: PathBuf,
+
+        #[arg(short = 'P', long, default_value = "low")]
+        priority: Priority,
+    },
     /// Create a batch of assets with extension data.
     MintBatch {
         asset_files_dir: PathBuf,
@@ -37,6 +47,9 @@ pub enum Commands {
         /// Delay in ms between transactions.
         #[arg(long, default_value = "100")]
         delay: u64,
+
+        #[arg(short = 'P', long, default_value = "low")]
+        priority: Priority,
     },
     /// Create a basic asset with no extensions.
     Create {
@@ -55,6 +68,9 @@ pub enum Commands {
         /// Owner of the created asset, defaults to authority pubkey.
         #[arg(short, long)]
         owner: Option<Pubkey>,
+
+        #[arg(short = 'P', long, default_value = "low")]
+        priority: Priority,
     },
     /// Get an asset account's data and decode it.
     Decode {
@@ -82,6 +98,9 @@ pub enum Commands {
         /// Specify each one separately: --role burn --role lock --role transfer
         #[arg(short = 'R', long)]
         role: Vec<String>,
+
+        #[arg(short = 'P', long, default_value = "low")]
+        priority: Priority,
     },
     /// Lock an asset, preventing any actions to be performed on it.
     Lock {
@@ -90,6 +109,9 @@ pub enum Commands {
 
         /// Path to the signer keypair file. Defaults to the config keypair.
         signer_keypair_path: Option<PathBuf>,
+
+        #[arg(short = 'P', long, default_value = "low")]
+        priority: Priority,
     },
     /// Revoke a delegate from an asset.
     Revoke {
@@ -104,6 +126,9 @@ pub enum Commands {
         /// Revoke all roles from the delegate and clear it.
         #[arg(long)]
         all: bool,
+
+        #[arg(short = 'P', long, default_value = "low")]
+        priority: Priority,
     },
     /// Transfer an asset to a new owner.
     Transfer {
@@ -112,6 +137,9 @@ pub enum Commands {
 
         /// The recipient of the asset.
         recipient: Pubkey,
+
+        #[arg(short = 'P', long, default_value = "low")]
+        priority: Priority,
     },
     /// Unlock an asset, allowing actions to be performed on it.
     Unlock {
@@ -120,5 +148,8 @@ pub enum Commands {
 
         /// Path to the signer keypair file. Defaults to the config keypair.
         signer_keypair_path: Option<PathBuf>,
+
+        #[arg(short = 'P', long, default_value = "low")]
+        priority: Priority,
     },
 }

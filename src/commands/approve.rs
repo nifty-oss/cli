@@ -11,6 +11,7 @@ pub struct ApproveArgs {
     pub asset: Pubkey,
     pub delegate: Pubkey,
     pub role: Vec<String>,
+    pub priority: Priority,
 }
 
 pub fn handle_approve(args: ApproveArgs) -> Result<()> {
@@ -33,7 +34,7 @@ pub fn handle_approve(args: ApproveArgs) -> Result<()> {
         })
         .collect();
 
-    let args = ApproveInstructionArgs {
+    let ix_args = ApproveInstructionArgs {
         delegate_input: DelegateInput::Some { roles },
     };
 
@@ -42,9 +43,21 @@ pub fn handle_approve(args: ApproveArgs) -> Result<()> {
         owner,
         delegate,
     }
-    .instruction(args);
+    .instruction(ix_args);
 
-    let sig = send_and_confirm_tx(&config.client, &[&owner_sk], &[ix])?;
+    let signers = vec![&owner_sk];
+
+    let micro_lamports = get_priority_fee(&args.priority);
+    let compute_units =
+        get_compute_units(&config.client, &[ix.clone()], &signers)?.unwrap_or(200_000);
+
+    let instructions = vec![
+        ComputeBudgetInstruction::set_compute_unit_limit(compute_units as u32),
+        ComputeBudgetInstruction::set_compute_unit_price(micro_lamports),
+        ix,
+    ];
+
+    let sig = send_and_confirm_tx_with_spinner(&config.client, &signers, &instructions)?;
 
     println!("Setting {delegate} as a delegate on asset {asset} in tx: {sig}");
 

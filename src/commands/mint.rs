@@ -1,4 +1,6 @@
-use crate::transaction::pack_instructions;
+use solana_sdk::compute_budget::ComputeBudgetInstruction;
+
+use crate::transaction::{get_compute_units, get_priority_fee, pack_instructions, Priority};
 
 use super::*;
 
@@ -6,6 +8,7 @@ pub struct MintArgs {
     pub keypair_path: Option<PathBuf>,
     pub rpc_url: Option<String>,
     pub asset_file_path: PathBuf,
+    pub priority: Priority,
 }
 
 pub async fn handle_mint(args: MintArgs) -> Result<()> {
@@ -43,6 +46,8 @@ pub async fn handle_mint(args: MintArgs) -> Result<()> {
         })
         .collect::<Vec<ExtensionArgs>>();
 
+    let micro_lamports = get_priority_fee(&args.priority);
+
     let instructions = mint(MintIxArgs {
         accounts,
         asset_args,
@@ -51,9 +56,20 @@ pub async fn handle_mint(args: MintArgs) -> Result<()> {
 
     let packed_instructions = pack_instructions(2, &authority_sk.pubkey(), &instructions);
 
+    let signers = vec![&authority_sk, &asset_sk];
+
     // Instructions are packed to max data length sizes, so we only put one in each tx.
     for instructions in packed_instructions {
-        let sig = send_and_confirm_tx(&config.client, &[&authority_sk, &asset_sk], &instructions)?;
+        let compute_units =
+            get_compute_units(&config.client, &instructions, &signers)?.unwrap_or(200_000);
+
+        let mut final_instructions = vec![
+            ComputeBudgetInstruction::set_compute_unit_limit(compute_units as u32),
+            ComputeBudgetInstruction::set_compute_unit_price(micro_lamports),
+        ];
+        final_instructions.extend(instructions);
+
+        let sig = send_and_confirm_tx_with_spinner(&config.client, &signers, &final_instructions)?;
         println!("sig: {}", sig);
     }
 

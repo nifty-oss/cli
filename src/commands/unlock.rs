@@ -7,6 +7,7 @@ pub struct UnlockArgs {
     pub rpc_url: Option<String>,
     pub asset: Pubkey,
     pub signer_keypair_path: Option<PathBuf>,
+    pub priority: Priority,
 }
 
 pub fn handle_unlock(args: UnlockArgs) -> Result<()> {
@@ -27,7 +28,19 @@ pub fn handle_unlock(args: UnlockArgs) -> Result<()> {
 
     let ix = Unlock { asset, signer }.instruction();
 
-    let sig = send_and_confirm_tx(&config.client, &[&payer_sk, &signer_sk], &[ix])?;
+    let signers = vec![&payer_sk, &signer_sk];
+
+    let micro_lamports = get_priority_fee(&args.priority);
+    let compute_units =
+        get_compute_units(&config.client, &[ix.clone()], &signers)?.unwrap_or(200_000);
+
+    let instructions = vec![
+        ComputeBudgetInstruction::set_compute_unit_limit(compute_units as u32),
+        ComputeBudgetInstruction::set_compute_unit_price(micro_lamports),
+        ix,
+    ];
+
+    let sig = send_and_confirm_tx_with_spinner(&config.client, &signers, &instructions)?;
 
     println!("Unlocking asset {asset} in tx: {sig}");
 
