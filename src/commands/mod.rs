@@ -22,7 +22,10 @@ pub use transfer::*;
 pub use unlock::*;
 
 // Internal lib
-pub use crate::{setup::CliConfig, transaction::send_and_confirm_tx};
+pub use crate::{
+    setup::CliConfig,
+    transaction::{get_compute_units, get_priority_fee, send_and_confirm_tx, Priority},
+};
 
 // Standard lib
 pub use std::{fs::File, path::PathBuf};
@@ -40,6 +43,7 @@ pub use {
     serde::{Deserialize, Serialize},
     solana_program::system_program,
     solana_sdk::{
+        compute_budget::ComputeBudgetInstruction,
         pubkey::Pubkey,
         signature::{read_keypair_file, Keypair},
         signer::Signer,

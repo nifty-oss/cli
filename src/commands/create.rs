@@ -7,6 +7,7 @@ pub struct CreateArgs {
     pub asset_keypair_path: Option<PathBuf>,
     pub immutable: bool,
     pub owner: Option<Pubkey>,
+    pub priority: Priority,
 }
 
 pub fn handle_create(args: CreateArgs) -> Result<()> {
@@ -41,7 +42,19 @@ pub fn handle_create(args: CreateArgs) -> Result<()> {
     }
     .instruction(ix_args);
 
-    let sig = send_and_confirm_tx(&config.client, &[&authority_sk, &asset_sk], &[ix])?;
+    let signers = vec![&authority_sk, &asset_sk];
+
+    let micro_lamports = get_priority_fee(&args.priority);
+    let compute_units =
+        get_compute_units(&config.client, &[ix.clone()], &signers)?.unwrap_or(200_000);
+
+    let instructions = vec![
+        ComputeBudgetInstruction::set_compute_unit_limit(compute_units as u32),
+        ComputeBudgetInstruction::set_compute_unit_price(micro_lamports),
+        ix,
+    ];
+
+    let sig = send_and_confirm_tx(&config.client, &signers, &instructions)?;
 
     println!("Asset {asset} created in tx: {sig}");
 

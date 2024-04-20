@@ -5,6 +5,7 @@ pub struct BurnArgs {
     pub rpc_url: Option<String>,
     pub asset: Pubkey,
     pub recipient: Option<Pubkey>,
+    pub priority: Priority,
 }
 
 pub fn handle_burn(args: BurnArgs) -> Result<()> {
@@ -26,7 +27,19 @@ pub fn handle_burn(args: BurnArgs) -> Result<()> {
     }
     .instruction();
 
-    let sig = send_and_confirm_tx(&config.client, &[&signer_sk], &[ix])?;
+    let signers = vec![&signer_sk];
+
+    let micro_lamports = get_priority_fee(&args.priority);
+    let compute_units =
+        get_compute_units(&config.client, &[ix.clone()], &signers)?.unwrap_or(200_000);
+
+    let instructions = vec![
+        ComputeBudgetInstruction::set_compute_unit_limit(compute_units as u32),
+        ComputeBudgetInstruction::set_compute_unit_price(micro_lamports),
+        ix,
+    ];
+
+    let sig = send_and_confirm_tx(&config.client, &signers, &instructions)?;
 
     println!("Burned asset {asset} in tx: {sig}");
 

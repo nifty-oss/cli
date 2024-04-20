@@ -12,6 +12,7 @@ pub struct MintBatchArgs {
     pub rpc_url: Option<String>,
     pub asset_files_dir: PathBuf,
     pub delay: u64,
+    pub priority: Priority,
 }
 
 pub struct AssetStruct {
@@ -133,6 +134,8 @@ pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
             .unwrap()
             .progress_chars("=>-");
 
+    let micro_lamports = get_priority_fee(&args.priority);
+
     for (i, asset_instructions) in instructions.into_iter().enumerate() {
         let client = client.clone();
         let authority_sk = authority_sk.clone();
@@ -146,19 +149,31 @@ pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
         // to create the asset and set its extension data.
         futures.push(tokio::spawn(async move {
             // Pack all the instructions for minting this asset into as few transactions as possible.
-            let packed_transactions =
+            let packed_instructions =
                 pack_instructions(2, &authority_sk.pubkey(), &asset_instructions);
 
             // Create a progress bar for each asset w/ the number of transactions to send.
-            let pb = mp_clone.add(ProgressBar::new(packed_transactions.len() as u64));
+            let pb = mp_clone.add(ProgressBar::new(packed_instructions.len() as u64));
             pb.set_style(sty_clone.clone());
 
             let asset_sk = &asset_keys.lock().await[i];
             let asset_address = &asset_sk.pubkey();
             pb.set_message(format!("sending transactions for asset {asset_address}"));
 
-            for transaction in packed_transactions {
-                let res = send_and_confirm_tx(&client, &[&authority_sk, &asset_sk], &transaction);
+            let signers = vec![&authority_sk, asset_sk];
+
+            for instructions in packed_instructions {
+                let compute_units = get_compute_units(&client, &instructions, &signers)
+                    .unwrap_or(Some(200_000))
+                    .unwrap_or(200_000);
+
+                let mut final_instructions = vec![
+                    ComputeBudgetInstruction::set_compute_unit_limit(compute_units as u32),
+                    ComputeBudgetInstruction::set_compute_unit_price(micro_lamports),
+                ];
+                final_instructions.extend(instructions);
+
+                let res = send_and_confirm_tx(&client, &signers, &final_instructions);
                 pb.inc(1);
 
                 match res {
