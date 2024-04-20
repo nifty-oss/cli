@@ -17,6 +17,8 @@ use std::{
     str::FromStr,
 };
 
+pub const DEFAULT_CU: u64 = 15_000;
+
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 pub enum Priority {
     None,
@@ -150,7 +152,7 @@ pub fn get_compute_units(
     client: &RpcClient,
     ixs: &[Instruction],
     signers: &[&Keypair],
-) -> Result<Option<u64>> {
+) -> Result<u64> {
     let config = RpcSimulateTransactionConfig {
         sig_verify: false,
         replace_recent_blockhash: true,
@@ -175,10 +177,7 @@ pub fn get_compute_units(
     }
 
     // Otherwise, we can get the compute units from the simulation result
-    let units = sim_result
-        .value
-        .units_consumed
-        .map(|units| (units as f64 * 1.20) as u64);
+    let units = sim_result.value.units_consumed.unwrap_or(DEFAULT_CU);
 
     Ok(units)
 }

@@ -60,8 +60,7 @@ pub async fn handle_mint(args: MintArgs) -> Result<()> {
 
     // Instructions are packed to max data length sizes, so we only put one in each tx.
     for instructions in packed_instructions {
-        let compute_units =
-            get_compute_units(&config.client, &instructions, &signers)?.unwrap_or(200_000);
+        let compute_units = get_compute_units(&config.client, &instructions, &signers)?;
 
         let mut final_instructions = vec![
             ComputeBudgetInstruction::set_compute_unit_limit(compute_units as u32),

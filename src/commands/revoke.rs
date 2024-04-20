@@ -45,8 +45,7 @@ pub fn handle_revoke(args: RevokeArgs) -> Result<()> {
     let signers = vec![&signer_sk];
 
     let micro_lamports = get_priority_fee(&args.priority);
-    let compute_units =
-        get_compute_units(&config.client, &[ix.clone()], &signers)?.unwrap_or(200_000);
+    let compute_units = get_compute_units(&config.client, &[ix.clone()], &signers)?;
 
     let instructions = vec![
         ComputeBudgetInstruction::set_compute_unit_limit(compute_units as u32),
