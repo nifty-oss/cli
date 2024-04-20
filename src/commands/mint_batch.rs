@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use crate::transaction::pack_instructions;
+use crate::transaction::{pack_instructions, DEFAULT_CU};
 
 use super::*;
 
@@ -163,9 +163,8 @@ pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
             let signers = vec![&authority_sk, asset_sk];
 
             for instructions in packed_instructions {
-                let compute_units = get_compute_units(&client, &instructions, &signers)
-                    .unwrap_or(Some(200_000))
-                    .unwrap_or(200_000);
+                let compute_units =
+                    get_compute_units(&client, &instructions, &signers).unwrap_or(DEFAULT_CU);
 
                 let mut final_instructions = vec![
                     ComputeBudgetInstruction::set_compute_unit_limit(compute_units as u32),
