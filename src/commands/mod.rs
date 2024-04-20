@@ -24,7 +24,10 @@ pub use unlock::*;
 // Internal lib
 pub use crate::{
     setup::CliConfig,
-    transaction::{get_compute_units, get_priority_fee, send_and_confirm_tx, Priority},
+    transaction::{
+        get_compute_units, get_priority_fee, send_and_confirm_tx, send_and_confirm_tx_with_spinner,
+        Priority,
+    },
 };
 
 // Standard lib

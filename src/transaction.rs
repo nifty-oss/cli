@@ -88,6 +88,18 @@ pub fn send_and_confirm_tx(
     Ok(signature)
 }
 
+pub fn send_and_confirm_tx_with_spinner(
+    client: &RpcClient,
+    signers: &[&Keypair],
+    ixs: &[Instruction],
+) -> Result<Signature> {
+    let tx = transaction!(client, signers, ixs);
+
+    let signature = client.send_and_confirm_transaction_with_spinner(&tx)?;
+
+    Ok(signature)
+}
+
 pub fn send_and_confirm_tx_with_retries(
     client: &RpcClient,
     signers: &[&Keypair],

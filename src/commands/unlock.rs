@@ -40,7 +40,7 @@ pub fn handle_unlock(args: UnlockArgs) -> Result<()> {
         ix,
     ];
 
-    let sig = send_and_confirm_tx(&config.client, &signers, &instructions)?;
+    let sig = send_and_confirm_tx_with_spinner(&config.client, &signers, &instructions)?;
 
     println!("Unlocking asset {asset} in tx: {sig}");
 

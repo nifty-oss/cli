@@ -54,7 +54,7 @@ pub fn handle_create(args: CreateArgs) -> Result<()> {
         ix,
     ];
 
-    let sig = send_and_confirm_tx(&config.client, &signers, &instructions)?;
+    let sig = send_and_confirm_tx_with_spinner(&config.client, &signers, &instructions)?;
 
     println!("Asset {asset} created in tx: {sig}");
 

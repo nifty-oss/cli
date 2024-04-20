@@ -39,7 +39,7 @@ pub fn handle_burn(args: BurnArgs) -> Result<()> {
         ix,
     ];
 
-    let sig = send_and_confirm_tx(&config.client, &signers, &instructions)?;
+    let sig = send_and_confirm_tx_with_spinner(&config.client, &signers, &instructions)?;
 
     println!("Burned asset {asset} in tx: {sig}");
 

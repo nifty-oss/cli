@@ -57,7 +57,7 @@ pub fn handle_approve(args: ApproveArgs) -> Result<()> {
         ix,
     ];
 
-    let sig = send_and_confirm_tx(&config.client, &signers, &instructions)?;
+    let sig = send_and_confirm_tx_with_spinner(&config.client, &signers, &instructions)?;
 
     println!("Setting {delegate} as a delegate on asset {asset} in tx: {sig}");
 

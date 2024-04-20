@@ -69,7 +69,7 @@ pub async fn handle_mint(args: MintArgs) -> Result<()> {
         ];
         final_instructions.extend(instructions);
 
-        let sig = send_and_confirm_tx(&config.client, &signers, &final_instructions)?;
+        let sig = send_and_confirm_tx_with_spinner(&config.client, &signers, &final_instructions)?;
         println!("sig: {}", sig);
     }
 

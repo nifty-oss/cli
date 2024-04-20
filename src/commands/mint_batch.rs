@@ -174,6 +174,7 @@ pub async fn handle_mint_batch(args: MintBatchArgs) -> Result<()> {
                 final_instructions.extend(instructions);
 
                 let res = send_and_confirm_tx(&client, &signers, &final_instructions);
+
                 pb.inc(1);
 
                 match res {
